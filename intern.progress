@@ -1,0 +1,173 @@
+Table creation and updation
+SELECT*
+FROM Portfolio..interns
+INSERT INTO Portfolio..interns VALUES (
+255, 'Raghav','Menon',29,'Bangalore','Karnatake', 'RM29@gmail.com'),
+(273,'James', 'Kalayil',45,'Mumbai', 'Maharashtra', 'Kalayil11@gmail.com'),
+(908,'Minnu','Mariam',35,'Kochi','Kerala','minnukuttypp@gmail.com'),
+(976,'Das','Kuttiyil',33,'Visakhapatnam','Andhra pradesh','happydas99@gmail.com'),
+(456,'Kalyani', 'Raman',25,'Chennai','Tamil Nadu','RamKal@email.com'),
+(657,'Katrina','Vicky',38,'Hyderabad','Telangana','KVmails345@gmail.com'),
+(305,'Unni','Krishnana',30,'Pattom','Thiruvananthapuram','Krishnanunii33@hotmail.com'),
+(202,'Kavya','Kumar',21,'Lucknow', 'Uttar Pradesh','KumarKya@gmail.com'),
+(321,'Diana','Penty',25,'Jaipur','Rajasthan','Dianadian77@gmail.com'),
+(789,'Laila','Sheikh',30, 'Agra','Uttar Pradesh','lailasweets@gmail.com')
+DELETE FROM Portfolio..interns
+where interns.internid = 25
+
+SELECT*
+FROM Portfolio..task
+
+INSERT INTO Portfolio..task VALUES (
+789,'DataScience','JupyterNotebook','PowerBI'),
+(202,'DataAnalysis','Excel','PowerBI'),
+(657,'DataAnalysis','Python','Tableau'),
+(908,'DataScience','JupyterNotebook','Tableau'),
+(202,'DataAnalysis','MySql','Tableau'),
+(456,'DataScience','JupyterNotebook','PowerBI'),
+(255,'DataScience','JupyterNotebook','Tableau'),
+(305,'DataAnalysis','MySql','PowerBI'),
+(976,'DataAnalysis','Python','PowerBI'),
+(789,'DataAnalysis','Excel','PowerBI')
+
+SELECT* FROM Portfolio..progress
+INSERT INTO Portfolio..progress VALUES(
+12,'DataAnalysis','2023-06-9','2023-06-20'),
+(23,'DataAnalysis','2023-06-12','2023-06-22'),
+(21,'DataScience','2023-06-29','2023-07-09'),
+(15,'DataAnalysis','2023-06-5','2023-06-15'),
+(18,'DataScience','2023-06-14','2023-06-24'),
+(26,'DataAnalysis','2023-06-4','2023-06-14'),
+(27,'DataScience','2023-06-19','2023-06-29'),
+(30,'DataAnalysis','2023-07-9','2023-07-29'),
+(09,'DataAnalysis','2023-06-11','2023-06-21'),
+(02,'DataScience','2023-06-7','2023-06-17')
+
+ALTER TABLE Portfolio..progress
+DROP COLUMN startdate
+ALTER TABLE Portfolio..progress
+ADD Progressupdate varchar(50)
+UPDATE Portfolio..progress SET Progressupdate= 
+'complete' where rollnumber = 12
+UPDATE Portfolio..progress SET Progressupdate= 
+'in progress' where rollnumber = 23
+UPDATE Portfolio..progress SET Progressupdate= 
+'complete' where rollnumber = 21
+UPDATE Portfolio..progress SET Progressupdate= 
+'in progress' where rollnumber = 15
+UPDATE Portfolio..progress SET Progressupdate= 
+'in progress' where rollnumber = 18
+UPDATE Portfolio..progress SET Progressupdate= 
+'in progress' where rollnumber = 26
+UPDATE Portfolio..progress SET Progressupdate= 
+'complete' where rollnumber = 27
+UPDATE Portfolio..progress SET Progressupdate= 
+'complete' where rollnumber = 30
+UPDATE Portfolio..progress SET Progressupdate= 
+'in progress' where rollnumber = 09
+UPDATE Portfolio..progress SET Progressupdate= 
+'complete' where rollnumber = 02
+SELECT* FROM Portfolio..task
+
+SELECT* FROM Portfolio..interns
+
+SELECT* FROM Portfolio..progress
+UPDATE portfolio..task
+SET userid = 321
+WHERE maintool='Excel' and userid=789
+
+ALTER TABLE Portfolio..task
+ADD rollnumber INT
+UPDATE Portfolio..task
+SET rollnumber = 
+    CASE 
+        WHEN userid = 202 THEN 30
+        WHEN userid = 255 THEN 2
+        WHEN userid = 273 THEN 23
+        WHEN userid = 305 THEN 27
+        WHEN userid = 321 THEN 9
+        WHEN userid = 456 THEN 15
+        WHEN userid = 657 THEN 18
+        WHEN userid = 789 THEN 12
+        WHEN userid = 908 THEN 21
+        WHEN userid = 976 THEN 26
+    END;
+
+ALTER TABLE Portfolio..interns
+ADD CONSTRAINT pk_interns_task PRIMARY KEY (internid);
+
+ALTER TABLE Portfolio..task
+ADD CONSTRAINT pk_task_progress PRIMARY KEY (userid);
+
+ALTER TABLE Portfolio..progress
+ADD CONSTRAINT pk_progress PRIMARY KEY (rollnumber);
+
+ALTER TABLE Portfolio..progress
+ADD CONSTRAINT fk_progress FOREIGN KEY (taskname) REFERENCES Portfolio..task (taskname);
+
+--Querying to fetch data in order to analyse and solve the problem at hand
+--tracking the progress of the interns regarding the completion of their tasks 
+--serves as an example of ad hoc reporting
+
+--interns working on data analysis tasks
+
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataAnalysis'
+ORDER BY 1
+
+--interns working on data science tasks
+
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataScience'
+ORDER BY 1
+
+--those who have completed dataanalysis projects and the deadlines
+
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate, p.deadline
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataAnalysis' AND p.Progressupdate='complete'
+ORDER BY 6
+
+--those who are still in progress and deadlines (data analysis)
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate, p.deadline
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataAnalysis' AND p.Progressupdate='in progress'
+ORDER BY 6
+
+--those who have completed dataScience projects and the deadlines
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate, p.deadline
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataScience' AND p.Progressupdate='complete'
+ORDER BY 6
+
+--those who are still in progress and deadlines (data science)
+SELECT i.internid, i.firstname, i.lastname,t.taskname, p.progressupdate, p.deadline
+FROM Portfolio..interns AS i
+INNER JOIN Portfolio..task AS t ON i.internid = t.userid
+INNER JOIN Portfolio..progress AS p ON t.taskname = p.taskname
+WHERE t.taskname='DataScience' AND p.Progressupdate='in progress'
+ORDER BY 6
+--the table that will be used for visualization.
+SELECT 
+    CONCAT(i.firstName, ' ', i.lastName) AS internFullName,
+    t.taskName,
+    p.progressupdate,
+    p.deadline
+FROM 
+    Portfolio..interns i
+INNER JOIN 
+    Portfolio..task t ON i.internid = t.userid
+LEFT JOIN 
+    Portfolio..progress p ON t.taskname = p.taskname;
